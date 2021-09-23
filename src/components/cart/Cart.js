@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import CartItem from "./CartItem";
 import "./Cart.scss";
 import { useAuthContext } from "../../context/auth-context";
+import { useProductsContext } from "../../context/products-context";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
   const { user } = useAuthContext();
+  const { refreshQuantity } = useProductsContext();
   const [productsAddedToCart, setProductsAddedToCart] = useState([]);
 
   const getProductsArrInLocalStorage = () => {
@@ -21,6 +23,7 @@ const Cart = () => {
     const newAddedProductsArr = productsAddedToCart.filter(
       (product) => product.productUid !== id
     );
+    refreshQuantity(newAddedProductsArr);
     setProductsAddedToCart(newAddedProductsArr);
     if (user) {
       localStorage.removeItem(user.uid);
@@ -35,6 +38,9 @@ const Cart = () => {
     getProductsArrInLocalStorage();
   }, [user]);
 
+
+
+  
   return (
     <>
       {productsAddedToCart.length !== 0 ? (

@@ -1,11 +1,16 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import categoryArr, { additionalProducts } from '../products/additionalProducts';
 import axios from 'axios';
+import { useAuthContext } from './auth-context';
 
 const ProductsContext = createContext();
 
 const ProductsProvider = ({ children }) => {
+  const { user } = useAuthContext();
   const [products, setProducts] = useState([]);
+  const [cartQuantity, setCartQuantity] = useState(null);
+
+console.log(user)
 
   useEffect(() => {
     const fetchAPI = async () => {
@@ -23,7 +28,7 @@ const ProductsProvider = ({ children }) => {
           }
         })
         const allProducts = originalProducts.concat(additionalProducts);
-        console.log(allProducts);
+        // console.log(allProducts);
         setProducts(allProducts);
       } catch (err) {
         console.error(`Error happened: ${err}`);
@@ -32,9 +37,31 @@ const ProductsProvider = ({ children }) => {
     fetchAPI();
   }, []);
 
+  const refreshQuantity = (cartContents) => {
+    if (cartContents && cartContents.length !== 0) {
+      let qty = 0;
+      cartContents.forEach(productData => {
+        qty += productData.quantity;
+      })
+      setCartQuantity(qty);  
+    } else {
+      setCartQuantity(null);
+    }
+  }
+
+  useEffect(() => {
+    const uid = user ? user.uid : "unknown";
+    refreshQuantity(JSON.parse(localStorage.getItem(uid)));
+  }, [user]);
+
   return (
-    <ProductsContext.Provider value={{ products, setProducts}}>
-      {children}
+    <ProductsContext.Provider value={{
+      products,
+      setProducts,
+      cartQuantity,
+      refreshQuantity
+    }}>
+      { children }
     </ProductsContext.Provider>
   )
 };

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import './Header.scss';
 import { FaUserCircle, FaShoppingCart, FaBookOpen } from "react-icons/fa";
-import { ImSearch, ImCross } from "react-icons/im";
+import { ImSearch, ImCross  } from "react-icons/im";
 import { useAuthContext } from '../../context/auth-context';
+import { useProductsContext } from '../../context/products-context';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
   const { user } = useAuthContext();
+  const { cartQuantity } = useProductsContext();
   const [searchInput, setSearchInput] = useState("")
   const [categoryMenu, setCategory] = useState(false)
   const [mobileCategoryMenu, setMobileCategory] = useState(false)
@@ -14,7 +16,6 @@ const Header = () => {
   const clearInput = () => {
     let searchInputValue = document.getElementsByClassName("searchInput")[0]
     searchInputValue.value = ""
-    console.log(searchInputValue)
   }
 
   return (
@@ -35,7 +36,10 @@ const Header = () => {
           <ul onMouseLeave={() => setCategory(false)}>
             <li onMouseEnter={() => setCategory(true)} onClick={()=>setMobileCategory(!mobileCategoryMenu)}>
               <FaBookOpen className="navIcon" /><p>Category</p></li>
-            <li onMouseEnter={() => setCategory(false)}><Link to={"/cart"}><FaShoppingCart className="navIcon" /></Link><p>Cart</p></li>
+            <li onMouseEnter={() => setCategory(false)}><Link to={"/cart"}><FaShoppingCart className="navIcon" /></Link><p>Cart</p>
+            
+            <p>{cartQuantity}</p>
+            </li>
             <li onMouseEnter={() => setCategory(false)}><Link to={"/account/"}><FaUserCircle className="navIcon" /></Link>
               <p>{user === null ? "Account" : user.providerData[0].displayName}</p></li>
             {categoryMenu === true &&

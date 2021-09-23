@@ -4,14 +4,17 @@ import reportWebVitals from "./reportWebVitals";
 import ProductsProvider from "./context/products-context";
 import AuthProvider from "./context/auth-context";
 import AppRouter from "./routers/AppRouter";
+import CommentsProvider from '../src/context/comments-context';
+// require('dotenv').config();
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
       <ProductsProvider>
-        <AppRouter />
-      </ProductsProvider>
-    </AuthProvider>
+        <CommentsProvider>
+            <AppRouter />
+        </CommentsProvider>
+      </ProductsProvider></AuthProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import React, { useState, useEffect, useContext } from "react";
 import { useProductsContext } from "../../context/products-context";
 import { useAuthContext } from "../../context/auth-context";
 import Specification from "./Specification";
@@ -8,12 +7,17 @@ import { v4 as uuidv4 } from "uuid";
 import PopUp from "./PopUp";
 import DetailResponsive from "./DetailResponsive";
 
+import Reviews from "../review/Reviews"
+import Rating from '@material-ui/lab/Rating';
+import Box from '@material-ui/core/Box';
+import { CommentsContext } from '../../context/comments-context';
 import "./Detail.scss";
 import MediaQuery from "react-responsive";
 
 const Detail = (props) => {
-  const { products } = useProductsContext();
+  const { products, refreshQuantity } = useProductsContext();
   const { user } = useAuthContext();
+  const { avgRating,labels,productComments } = useContext(CommentsContext)
 
   // Popup Function
   const [popUp, setPopUp] = useState(false);
@@ -65,6 +69,7 @@ const Detail = (props) => {
   }, [products]);
 
   useEffect(() => {
+    refreshQuantity(addedProductsArr);
     // user && localStorage.setItem(user.uid, JSON.stringify(addedProductsArr));
     if (user) {
       localStorage.setItem(user.uid, JSON.stringify(addedProductsArr));
@@ -150,12 +155,25 @@ const Detail = (props) => {
                   {chosenProductInfo.product[0].title}
                 </h2>
                 <span className="rating-star">
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                  <FaStar />
-                  <FaStarHalfAlt />
-                </span>
+                
+                  <Box component="fieldset" mb={3} borderColor="transparent">
+                    <Rating
+                      name="simple-controlled"
+                      value={avgRating ? avgRating : 0}
+                      readOnly
+                    />
+                  </Box>
+                  {avgRating ? 
+                  <>
+                  <span style={{color:"black",fontSize:"20pt",fontStyle:"italic"}}>"{labels[avgRating]}"</span>
+                  <span style={{color:"grey",fontSize:"12pt",fontStyle:"italic"}}>rated by {productComments.length}customer(s)</span>
+                  </>
+                  :
+                  <p style={{color:"grey",fontSize:"12pt",fontStyle:"italic"}}>This product have no rating yet.</p>
+                }
+
+
+              </span>
                 <p className="price-title">Price:</p>
                 <p className="price">
                   $
@@ -221,6 +239,8 @@ const Detail = (props) => {
               </div>
             </div>
           </MediaQuery>
+         
+          <Reviews id={props.match.params.id} />
         </>
       )}
     </main>
